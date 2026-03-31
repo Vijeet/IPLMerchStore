@@ -1,0 +1,62 @@
+# Build results
+bin/
+obj/
+dist/
+
+# Visual Studio cache/options directory
+.vs/
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# Rider / IntelliJ
+.idea/
+*.sln.iml
+*.swp
+*.swo
+*~
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Local user-specific files (Visual Studio)
+.vscode/launch.json
+.vscode/settings.json
+
+# NuGet
+packages/
+*.nupkg
+*.snupkg
+.nuget/
+
+# Test results
+TestResults/
+*.trx
+*.coverage
+coverage/
+
+# Runtime and build outputs
+*.dll
+*.exe
+.NET/ 
+.netcore/
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Backup files
+*.bak
+*.back
+
+# SQL Server Express
+*.mdf
+*.ldf
+
+# Logs
+logs/
+*.log
