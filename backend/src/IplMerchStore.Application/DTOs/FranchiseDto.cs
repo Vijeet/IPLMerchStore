@@ -5,7 +5,9 @@ public class FranchiseDto
     public int Id { get; set; }
     public string? Name { get; set; }
     public string? ShortCode { get; set; }
-    public string? City { get; set; }
+    public string? PrimaryColor { get; set; }
+    public string? SecondaryColor { get; set; }
     public string? LogoUrl { get; set; }
-    public string? Description { get; set; }
+    public DateTime CreatedAtUtc { get; set; }
+    public DateTime UpdatedAtUtc { get; set; }
 }
