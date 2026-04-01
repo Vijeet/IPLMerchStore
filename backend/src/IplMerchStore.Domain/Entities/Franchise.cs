@@ -8,10 +8,10 @@ namespace IplMerchStore.Domain.Entities;
 public class Franchise : BaseEntity
 {
     public required string Name { get; set; }
-    public string? ShortCode { get; set; }
-    public string? City { get; set; }
+    public required string ShortCode { get; set; }
+    public required string PrimaryColor { get; set; }
+    public required string SecondaryColor { get; set; }
     public string? LogoUrl { get; set; }
-    public string? Description { get; set; }
 
     // Navigation properties
     public ICollection<Product> Products { get; set; } = new List<Product>();

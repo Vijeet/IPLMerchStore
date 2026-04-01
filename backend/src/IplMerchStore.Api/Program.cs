@@ -1,5 +1,7 @@
 using IplMerchStore.Api.Middleware;
+using IplMerchStore.Application.Interfaces;
 using IplMerchStore.Infrastructure.Persistence;
+using IplMerchStore.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,6 +29,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         sqlOptions.MigrationsAssembly("IplMerchStore.Infrastructure");
     });
 });
+
+// Add application services
+builder.Services.AddScoped<IFranchiseService, FranchiseService>();
 
 // Add health checks
 builder.Services.AddHealthChecks();
