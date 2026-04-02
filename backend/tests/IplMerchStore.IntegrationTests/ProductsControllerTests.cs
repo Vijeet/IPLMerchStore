@@ -85,8 +85,13 @@ public class ProductsControllerTests : IClassFixture<IplMerchStoreWebApplication
         // Act
         var response = await _client.GetAsync("/api/products?activeOnly=true");
 
-        // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        // Assert - With debug output
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var errorContent = await response.Content.ReadAsStringAsync();
+            throw new Xunit.Sdk.XunitException($"Expected OK but got {response.StatusCode}. Response: {errorContent}");
+        }
+
         var content = await response.Content.ReadAsStringAsync();
         Assert.Contains("isActive", content);
     }

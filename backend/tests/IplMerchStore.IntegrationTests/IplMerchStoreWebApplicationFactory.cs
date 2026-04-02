@@ -32,11 +32,13 @@ public class IplMerchStoreWebApplicationFactory : WebApplicationFactory<Program>
                 options.UseSqlite("Data Source=:memory:");
             });
 
-            // Build service provider and create the database
+            // Build service provider and create and migrate the database
             var sp = services.BuildServiceProvider();
             using var scope = sp.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-            db.Database.OpenConnection();
+            
+            // Ensure the database is deleted and recreated fresh for tests
+            db.Database.EnsureDeleted();
             db.Database.EnsureCreated();
 
             // Seed test data
@@ -46,9 +48,8 @@ public class IplMerchStoreWebApplicationFactory : WebApplicationFactory<Program>
 
     private static void SeedTestData(AppDbContext db)
     {
-        // Check if data already exists
-        if (db.Franchises.Any())
-            return;
+        // Don't check if data exists since we just created the database
+        // Just seed the test data directly
 
         // Create test franchises
         var franchises = new List<Franchise>
