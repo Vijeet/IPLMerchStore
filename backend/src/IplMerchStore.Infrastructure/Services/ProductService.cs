@@ -95,8 +95,8 @@ public class ProductService : IProductService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving products");
-            return Result<PagedResult<ProductDto>>.FailureResult("Failed to retrieve products");
+            _logger.LogError(ex, "Error retrieving products: {Message}", ex.Message);
+            return Result<PagedResult<ProductDto>>.FailureResult($"Failed to retrieve products: {ex.Message}");
         }
     }
 

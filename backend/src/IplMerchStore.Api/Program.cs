@@ -33,6 +33,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Add application services
 builder.Services.AddScoped<IFranchiseService, FranchiseService>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ISearchService, SearchService>();
 
 // Add health checks
 builder.Services.AddHealthChecks();
