@@ -34,6 +34,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IFranchiseService, FranchiseService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ISearchService, SearchService>();
+builder.Services.AddScoped<ICartService, CartService>();
 
 // Add health checks
 builder.Services.AddHealthChecks();
