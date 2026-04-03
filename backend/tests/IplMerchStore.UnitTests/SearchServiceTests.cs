@@ -309,7 +309,7 @@ public class SearchServiceTests
         Assert.Equal(2, result1.Data.Items.Count());
         Assert.Equal(2, result2.Data.Items.Count());
         Assert.NotEqual(result1.Data.Items.First().Id, result2.Data.Items.First().Id);
-        Assert.Equal(5, result1.Data.TotalPages); // 5 items / 2 per page
+        Assert.Equal(3, result1.Data.TotalPages); // 5 active items / 2 per page = 3 pages
     }
 
     [Fact]

@@ -201,7 +201,7 @@ public class ProductValidatorTests
 
         // Assert
         Assert.False(isValid);
-        Assert.Contains("Invalid product type", errors);
+        Assert.Contains("Invalid product type. Must be between 1 and 8", errors);
     }
 
     [Fact]

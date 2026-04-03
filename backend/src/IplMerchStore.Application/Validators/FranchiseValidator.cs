@@ -47,10 +47,11 @@ public static class FranchiseValidator
         if (string.IsNullOrWhiteSpace(color))
             return false;
 
-        // Allow formats: #RRGGBB or RRGGBB or #RGB or RGB
-        if (color.StartsWith("#"))
-            color = color[1..];
+        // Require # prefix and check for valid 6-digit hex code
+        if (!color.StartsWith("#"))
+            return false;
 
-        return color.Length == 6 && color.All(c => "0123456789ABCDEFabcdef".Contains(c));
+        var hexPart = color[1..];
+        return hexPart.Length == 6 && hexPart.All(c => "0123456789ABCDEFabcdef".Contains(c));
     }
 }
