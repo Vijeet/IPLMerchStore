@@ -99,7 +99,7 @@ public class SearchService : ISearchService
             // Calculate relevance score and apply sorting
             // Name matches score higher (90-100) than description matches (50-89)
             // Then sort alphabetically by name for consistent results
-            var results = await searchQuery
+            var results = searchQuery
                 .AsEnumerable() // Switch to LINQ-to-Objects for relevance calculation
                 .Select(p => new
                 {
@@ -111,7 +111,7 @@ public class SearchService : ISearchService
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .Select(x => MapToProductSearchResultDto(x.Product, x.RelevanceScore))
-                .ToListAsync();
+                .ToList();
 
             var pagedResult = new PagedResult<ProductSearchResultDto>(
                 results,
@@ -167,7 +167,7 @@ public class SearchService : ISearchService
 
             // Get unique product names and franchise combinations
             // Sorted by relevance (name matches first) then alphabetically
-            var suggestions = await suggestionsQuery
+            var suggestions = suggestionsQuery
                 .AsEnumerable()
                 .Select(p => new
                 {
@@ -179,7 +179,7 @@ public class SearchService : ISearchService
                 .Select(x => x.Product)
                 .Take(limit)
                 .Select(p => $"{p.Name} ({p.Franchise?.ShortCode ?? "Unknown"})")
-                .ToListAsync();
+                .ToList();
 
             return Result<IEnumerable<string>>.SuccessResult(
                 suggestions,
