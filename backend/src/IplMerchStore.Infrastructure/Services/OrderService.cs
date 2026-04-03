@@ -31,15 +31,18 @@ public class OrderService : IOrderService
 {
     private readonly AppDbContext _dbContext;
     private readonly ICartService _cartService;
+    private readonly IPaymentService _paymentService;
     private readonly ILogger<OrderService> _logger;
 
     public OrderService(
         AppDbContext dbContext,
         ICartService cartService,
+        IPaymentService paymentService,
         ILogger<OrderService> logger)
     {
         _dbContext = dbContext;
         _cartService = cartService;
+        _paymentService = paymentService;
         _logger = logger;
     }
 
@@ -239,6 +242,26 @@ public class OrderService : IOrderService
             // Add order to database
             _dbContext.Orders.Add(order);
             await _dbContext.SaveChangesAsync(cancellationToken);
+
+            // Process payment
+            _logger.LogInformation("Processing payment for order {OrderId}, amount: {Amount}", order.Id, order.TotalAmount);
+            var paymentResult = await _paymentService.ProcessPaymentAsync(order.Id, order.TotalAmount, "INR", cancellationToken);
+
+            if (!paymentResult.Success)
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                _logger.LogError("Payment processing failed for order {OrderId}: {Message}", order.Id, paymentResult.Message);
+                return Result<OrderDto>.FailureResult($"Payment processing failed: {paymentResult.Message}");
+            }
+
+            if (!paymentResult.Data)
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                _logger.LogError("Payment declined for order {OrderId}", order.Id);
+                return Result<OrderDto>.FailureResult("Payment was declined. Please try again.");
+            }
+
+            _logger.LogInformation("Payment successful for order {OrderId}", order.Id);
 
             // Clear user's cart
             var clearCartResult = await _cartService.ClearCartAsync(userId, cancellationToken);
