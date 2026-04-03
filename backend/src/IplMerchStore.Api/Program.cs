@@ -35,6 +35,7 @@ builder.Services.AddScoped<IFranchiseService, FranchiseService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ISearchService, SearchService>();
 builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 // Add health checks
 builder.Services.AddHealthChecks();
