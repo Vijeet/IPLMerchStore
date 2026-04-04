@@ -3,4 +3,4 @@ export { useFranchises } from './useFranchises';
 export { useProducts } from './useProducts';
 export { useProductDetails } from './useProductDetails';
 export { useCart } from './useCart';
-export { useOrders, useOrderDetail, useCheckout } from './useOrders';
+export { useOrders, useOrderDetail, useCheckout, useCancelOrder } from './useOrders';

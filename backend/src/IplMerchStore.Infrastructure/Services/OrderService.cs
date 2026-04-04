@@ -198,6 +198,7 @@ public class OrderService : IOrderService
             }
 
             // Create order
+            var now = DateTime.UtcNow;
             var order = new Order
             {
                 Id = 0, // EF Core will generate the ID
@@ -207,7 +208,9 @@ public class OrderService : IOrderService
                 CustomerEmail = orderDto.CustomerEmail,
                 CustomerPhone = orderDto.CustomerPhone,
                 TotalAmount = 0, // Will be calculated below
-                Items = new List<OrderItem>()
+                Items = new List<OrderItem>(),
+                CreatedAtUtc = now,
+                UpdatedAtUtc = now,
             };
 
             decimal orderTotal = 0;
@@ -225,7 +228,9 @@ public class OrderService : IOrderService
                     Quantity = cartItem.Quantity,
                     UnitPrice = cartItem.UnitPrice,
                     SubTotal = cartItem.UnitPrice * cartItem.Quantity,
-                    Product = product
+                    Product = product,
+                    CreatedAtUtc = now,
+                    UpdatedAtUtc = now,
                 };
 
                 order.Items.Add(orderItem);
@@ -299,6 +304,55 @@ public class OrderService : IOrderService
             await transaction.RollbackAsync(cancellationToken);
             _logger.LogError(ex, "Error creating order for userId: {UserId}", userId);
             return Result<OrderDto>.FailureResult("An error occurred while creating order");
+        }
+    }
+
+    /// <summary>
+    /// Cancel a pending order. Only orders in Pending status can be cancelled.
+    /// Restores product inventory for each order item.
+    /// </summary>
+    public async Task<Result<OrderDto>> CancelOrderAsync(string userId, int orderId, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var order = await _dbContext.Orders
+                .Include(o => o.Items)
+                .ThenInclude(oi => oi.Product)
+                .FirstOrDefaultAsync(o => o.Id == orderId, cancellationToken);
+
+            if (order == null || order.UserId != userId)
+            {
+                return Result<OrderDto>.FailureResult("Order not found");
+            }
+
+            if (order.Status != OrderStatus.Pending)
+            {
+                return Result<OrderDto>.FailureResult("Only pending orders can be cancelled");
+            }
+
+            // Restore inventory
+            foreach (var item in order.Items)
+            {
+                if (item.Product != null)
+                {
+                    item.Product.InventoryCount += item.Quantity;
+                    _dbContext.Products.Update(item.Product);
+                }
+            }
+
+            order.Status = OrderStatus.Cancelled;
+            order.UpdatedAtUtc = DateTime.UtcNow;
+            _dbContext.Orders.Update(order);
+
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
+            _logger.LogInformation("Order {OrderId} cancelled for user {UserId}", orderId, userId);
+            return Result<OrderDto>.SuccessResult(MapOrderToDto(order), "Order cancelled successfully");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error cancelling order {OrderId} for user {UserId}", orderId, userId);
+            return Result<OrderDto>.FailureResult("An error occurred while cancelling the order");
         }
     }
 

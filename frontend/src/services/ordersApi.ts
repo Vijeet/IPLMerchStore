@@ -44,3 +44,16 @@ export const getOrderDetail = async (
   }
   return response.data;
 };
+
+export const cancelOrder = async (
+  orderId: number,
+  userId: string = DEMO_USER_ID
+): Promise<Order> => {
+  const response = await apiClient.post<Order>(
+    API_ENDPOINTS.CANCEL_ORDER(userId, String(orderId))
+  );
+  if (!response.success || !response.data) {
+    throw new Error(response.message || 'Failed to cancel order');
+  }
+  return response.data;
+};
