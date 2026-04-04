@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { LoadingSpinner, ErrorBoundary, Button } from '@components/shared';
 import { useProductDetails } from '@hooks/useProductDetails';
+import { useCart } from '@hooks/useCart';
+import { useToast } from '@components/shared/Toast';
 import { PRODUCT_TYPE_LABELS } from '@types/product';
 import { formatCurrency } from '@utils/formatters';
 import { ROUTES } from '@utils/constants';
@@ -13,31 +15,36 @@ export const ProductDetailsPage: React.FC = () => {
   const [addedToCart, setAddedToCart] = useState(false);
 
   const { data: product, isLoading, error } = useProductDetails(id);
+  const { addToCart, isMutating } = useCart();
+  const { showToast } = useToast();
 
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Math.max(1, Math.min(10, parseInt(e.target.value) || 1));
     setQuantity(value);
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!product) return;
 
-    // TODO: Integrate with cart module when available
-    console.log(`Adding ${quantity} of product ${product.id} (${product.name}) to cart`);
-
-    // Stub: Show success message
-    setAddedToCart(true);
-    setTimeout(() => setAddedToCart(false), 3000);
+    try {
+      await addToCart({ productId: product.id, quantity });
+      showToast(`${product.name} added to cart`, 'success');
+      setAddedToCart(true);
+      setTimeout(() => setAddedToCart(false), 3000);
+    } catch {
+      showToast('Failed to add item to cart', 'error');
+    }
   };
 
-  const handleBuyNow = () => {
+  const handleBuyNow = async () => {
     if (!product) return;
 
-    // TODO: Integrate with checkout when available
-    console.log(`Buying ${quantity} of product ${product.id}. Navigating to checkout...`);
-
-    // Stub: For now, just navigate to cart
-    navigate(ROUTES.CART);
+    try {
+      await addToCart({ productId: product.id, quantity });
+      navigate(ROUTES.CART);
+    } catch {
+      showToast('Failed to add item to cart', 'error');
+    }
   };
 
   if (isLoading) {
@@ -260,14 +267,15 @@ export const ProductDetailsPage: React.FC = () => {
           >
             <Button
               onClick={handleAddToCart}
-              disabled={isOutOfStock}
+              disabled={isOutOfStock || isMutating}
               variant="secondary"
+              loading={isMutating}
             >
               🛒 Add to Cart
             </Button>
             <Button
               onClick={handleBuyNow}
-              disabled={isOutOfStock}
+              disabled={isOutOfStock || isMutating}
               variant="primary"
             >
               💳 Buy Now

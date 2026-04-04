@@ -1,24 +1,36 @@
+/** Matches backend CartItemResponse */
 export type CartItem = {
-  productId: string;
+  id: number;
+  productId: number;
   productName: string;
-  price: number;
+  productImageUrl: string;
+  productSku: string;
+  unitPrice: number;
   quantity: number;
-  imageUrl: string;
+  subtotal: number;
+  currentInventory: number | null;
+  isProductActive: boolean;
 };
 
+/** Matches backend CartResponse */
 export type Cart = {
+  id: number;
   userId: string;
   items: CartItem[];
-  totalPrice: number;
-  createdAt: string;
-  updatedAt: string;
+  itemCount: number;
+  totalQuantity: number;
+  totalAmount: number;
+  currency: string;
+  isEmpty: boolean;
 };
 
+/** Matches backend AddCartItemRequest */
 export type AddToCartRequest = {
-  productId: string;
+  productId: number;
   quantity: number;
 };
 
+/** Matches backend UpdateCartItemRequest */
 export type UpdateCartItemRequest = {
   quantity: number;
 };

@@ -2,6 +2,8 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Product, ProductSearchResult, PRODUCT_TYPE_LABELS } from '@types/product';
 import { formatCurrency } from '@utils/formatters';
+import { useCart } from '@hooks/useCart';
+import { useToast } from '@components/shared/Toast';
 
 interface ProductCardProps {
   product: Product | ProductSearchResult;
@@ -13,12 +15,24 @@ interface ProductCardProps {
  */
 export const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) => {
   const navigate = useNavigate();
+  const { addToCart, isMutating } = useCart();
+  const { showToast } = useToast();
 
   const handleClick = () => {
     if (onClick) {
       onClick();
     }
     navigate(`/products/${product.id}`);
+  };
+
+  const handleAddToCart = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await addToCart({ productId: product.id, quantity: 1 });
+      showToast(`${product.name} added to cart`, 'success');
+    } catch {
+      showToast('Failed to add item to cart', 'error');
+    }
   };
 
   const getProductTypeLabel = (product: Product | ProductSearchResult): string => {
@@ -172,6 +186,40 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) =>
         >
           {formatCurrency(product.price, product.currency)}
         </div>
+
+        {/* Add to Cart */}
+        {!isOutOfStock && (
+          <button
+            onClick={handleAddToCart}
+            disabled={isMutating}
+            style={{
+              marginTop: '0.75rem',
+              width: '100%',
+              padding: '0.5rem',
+              fontSize: '0.85rem',
+              fontWeight: 600,
+              border: '1px solid var(--primary-color)',
+              borderRadius: 'var(--radius-md)',
+              backgroundColor: 'transparent',
+              color: 'var(--primary-color)',
+              cursor: isMutating ? 'not-allowed' : 'pointer',
+              opacity: isMutating ? 0.6 : 1,
+              transition: 'background-color 0.2s, color 0.2s',
+            }}
+            onMouseEnter={(e) => {
+              if (!isMutating) {
+                e.currentTarget.style.backgroundColor = 'var(--primary-color)';
+                e.currentTarget.style.color = 'white';
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.color = 'var(--primary-color)';
+            }}
+          >
+            {isMutating ? '⏳ Adding...' : '🛒 Add to Cart'}
+          </button>
+        )}
       </div>
     </div>
   );
