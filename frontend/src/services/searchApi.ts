@@ -1,6 +1,6 @@
 import { apiClient } from '@services/api';
-import { ProductSearchResult } from '@types/product';
-import { ApiResponse, PaginatedResponse } from '@types/common';
+import { ProductSearchResult } from '@appTypes/product';
+import { PaginatedResponse } from '@appTypes/common';
 import { API_ENDPOINTS } from '@utils/constants';
 
 export interface SearchProductsParams {

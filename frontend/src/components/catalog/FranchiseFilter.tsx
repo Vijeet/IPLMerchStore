@@ -1,5 +1,5 @@
 import React from 'react';
-import { Franchise } from '@types/franchise';
+import { Franchise } from '@appTypes/franchise';
 
 interface FranchiseFilterProps {
   franchises: Franchise[];

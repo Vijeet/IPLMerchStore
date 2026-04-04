@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { ProductDetail } from '@types/product';
-import { ApiError } from '@types/common';
+import { ProductDetail } from '@appTypes/product';
+import { ApiError } from '@appTypes/common';
 import { getProductById as fetchProductById } from '@services/productsApi';
 import { QUERY_KEYS } from '@utils/constants';
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { PRODUCT_TYPE_LABELS } from '@types/product';
+import { PRODUCT_TYPE_LABELS } from '@appTypes/product';
 
 interface ProductTypeFilterProps {
   selectedType?: number;

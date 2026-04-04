@@ -28,7 +28,7 @@
       "@components/*": ["./components/*"],
       "@pages/*": ["./pages/*"],
       "@services/*": ["./services/*"],
-      "@types/*": ["./types/*"],
+      "@appTypes/*": ["./types/*"],
       "@utils/*": ["./utils/*"],
       "@hooks/*": ["./hooks/*"],
       "@styles/*": ["./styles/*"]

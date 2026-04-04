@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AppLayout } from '@components/layout/AppLayout';
+import { ToastProvider } from '@components/shared/Toast';
 import { ProductListPage } from '@pages/ProductListPage';
 import { ProductDetailsPage } from '@pages/ProductDetailsPage';
 import { CartPage } from '@pages/CartPage';
@@ -61,6 +62,7 @@ const HomePage: React.FC = () => (
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
+      <ToastProvider>
       <Router>
         <AppLayout>
           <Routes>
@@ -74,6 +76,7 @@ function App() {
           </Routes>
         </AppLayout>
       </Router>
+      </ToastProvider>
     </QueryClientProvider>
   );
 }

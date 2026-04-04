@@ -1,6 +1,6 @@
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import { apiClient } from '@services/api';
-import { ApiError } from '@types/common';
+import { ApiError } from '@appTypes/common';
 
 /**
  * Generic API hook for GET requests
