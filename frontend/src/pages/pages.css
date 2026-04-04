@@ -1,0 +1,74 @@
+/* Pages Styles */
+
+.not-found-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: var(--spacing-3xl) var(--spacing-lg);
+  text-align: center;
+}
+
+.not-found-title {
+  font-size: 5rem;
+  font-weight: 700;
+  color: var(--secondary-color);
+  margin: 0;
+  line-height: 1;
+}
+
+.not-found-heading {
+  font-size: var(--font-2xl);
+  color: var(--text-primary);
+  margin: var(--spacing-lg) 0;
+}
+
+.not-found-description {
+  color: var(--text-secondary);
+  max-width: 400px;
+  margin: 0 auto var(--spacing-xl);
+}
+
+.not-found-button {
+  background-color: var(--secondary-color);
+  color: white;
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-xl);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: var(--font-base);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.not-found-button:hover {
+  background-color: #1e40af;
+}
+
+/* Page Grid - Ready for product/order lists */
+.page-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+}
+
+/* Page Loading */
+.page-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .not-found-title {
+    font-size: 3rem;
+  }
+
+  .page-grid {
+    grid-template-columns: 1fr;
+  }
+}
