@@ -1,8 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Cart } from '@types/cart';
+import { Cart } from '@appTypes/cart';
 import { formatCurrency } from '@utils/formatters';
 import { Button } from '@components/shared';
+import { useCheckout } from '@hooks/useOrders';
 import { ROUTES } from '@utils/constants';
 
 interface CartSummaryProps {
@@ -12,6 +13,15 @@ interface CartSummaryProps {
 
 export const CartSummary: React.FC<CartSummaryProps> = ({ cart, isMutating }) => {
   const navigate = useNavigate();
+  const { checkout, isCheckingOut } = useCheckout();
+
+  const handleCheckout = async () => {
+    try {
+      await checkout({});
+    } catch {
+      // Error toast handled in useCheckout hook
+    }
+  };
 
   return (
     <div
@@ -47,11 +57,12 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ cart, isMutating }) =>
 
       <Button
         variant="primary"
-        disabled={isMutating || cart.isEmpty}
-        onClick={() => navigate(ROUTES.ORDERS)}
+        disabled={isMutating || isCheckingOut || cart.isEmpty}
+        loading={isCheckingOut}
+        onClick={handleCheckout}
         className=""
       >
-        Proceed to Checkout
+        {isCheckingOut ? 'Placing Order...' : 'Place Order'}
       </Button>
 
       <button

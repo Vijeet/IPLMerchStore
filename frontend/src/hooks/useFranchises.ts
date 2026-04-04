@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Franchise } from '@types/franchise';
-import { ApiError } from '@types/common';
+import { ApiError } from '@appTypes/common';
 import { getFranchises as fetchFranchises } from '@services/franchisesApi';
 import { QUERY_KEYS, PAGINATION } from '@utils/constants';
 

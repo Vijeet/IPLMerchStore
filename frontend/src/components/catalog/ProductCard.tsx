@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Product, ProductSearchResult, PRODUCT_TYPE_LABELS } from '@types/product';
+import { Product, ProductSearchResult, PRODUCT_TYPE_LABELS } from '@appTypes/product';
 import { formatCurrency } from '@utils/formatters';
 import { useCart } from '@hooks/useCart';
 import { useToast } from '@components/shared/Toast';

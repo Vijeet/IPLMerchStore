@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Cart, AddToCartRequest, UpdateCartItemRequest } from '@types/cart';
-import { ApiError } from '@types/common';
+import { Cart, AddToCartRequest, UpdateCartItemRequest } from '@appTypes/cart';
+import { ApiError } from '@appTypes/common';
 import { getCart, addToCart, updateCartItem, removeCartItem } from '@services/cartApi';
 import { QUERY_KEYS } from '@utils/constants';
 

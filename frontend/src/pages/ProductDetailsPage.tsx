@@ -4,7 +4,6 @@ import { LoadingSpinner, ErrorBoundary, Button } from '@components/shared';
 import { useProductDetails } from '@hooks/useProductDetails';
 import { useCart } from '@hooks/useCart';
 import { useToast } from '@components/shared/Toast';
-import { PRODUCT_TYPE_LABELS } from '@types/product';
 import { formatCurrency } from '@utils/formatters';
 import { ROUTES } from '@utils/constants';
 

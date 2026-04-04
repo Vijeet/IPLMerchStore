@@ -1,5 +1,5 @@
 import { apiClient } from '@services/api';
-import { Cart, AddToCartRequest, UpdateCartItemRequest } from '@types/cart';
+import { Cart, AddToCartRequest, UpdateCartItemRequest } from '@appTypes/cart';
 import { API_ENDPOINTS } from '@utils/constants';
 
 const DEMO_USER_ID = 'demo-user-1';

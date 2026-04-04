@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 interface SearchBarProps {
   value: string;
@@ -17,7 +17,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   onSearch,
 }) => {
   const [localValue, setLocalValue] = useState(value);
-  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   
   // Sync external value changes (e.g., when URL params change)
   useEffect(() => {

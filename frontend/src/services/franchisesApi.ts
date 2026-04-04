@@ -1,6 +1,6 @@
 import { apiClient } from '@services/api';
-import { Franchise } from '@types/franchise';
-import { ApiResponse, PaginatedResponse } from '@types/common';
+import { Franchise } from '@appTypes/franchise';
+import { PaginatedResponse } from '@appTypes/common';
 import { API_ENDPOINTS } from '@utils/constants';
 
 /**

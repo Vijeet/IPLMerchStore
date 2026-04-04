@@ -10,7 +10,7 @@ import { Pagination } from '@components/catalog/Pagination';
 import { useFranchises } from '@hooks/useFranchises';
 import { searchProducts } from '@services/searchApi';
 import { getProducts } from '@services/productsApi';
-import { Product, ProductSearchResult } from '@types/product';
+import { Product, ProductSearchResult } from '@appTypes/product';
 import { PAGINATION } from '@utils/constants';
 
 export const ProductListPage: React.FC = () => {
