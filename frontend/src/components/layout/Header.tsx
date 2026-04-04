@@ -1,12 +1,17 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { ROUTES } from '@utils/constants';
 import { useCart } from '@hooks/useCart';
+import { useAuth } from '@hooks/useAuth';
 import './Header.css';
 
 export const Header: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { cart } = useCart();
+  const { isLoggedIn, email, logout } = useAuth();
 
   const isActive = (path: string): boolean => {
     return location.pathname === path || location.pathname.startsWith(path + '/');
@@ -57,6 +62,34 @@ export const Header: React.FC = () => {
               >
                 Orders
               </Link>
+            </li>
+            <li style={{ marginLeft: '1rem' }}>
+              {isLoggedIn ? (
+                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem' }}>
+                  <span style={{ color: 'var(--text-secondary)' }}>{email}</span>
+                  <button
+                    onClick={() => { queryClient.clear(); logout(); navigate(ROUTES.HOME); }}
+                    style={{
+                      background: 'none',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: 'var(--radius-md, 6px)',
+                      color: 'var(--text-primary)',
+                      cursor: 'pointer',
+                      padding: '0.3rem 0.7rem',
+                      fontSize: '0.8rem',
+                    }}
+                  >
+                    Logout
+                  </button>
+                </span>
+              ) : (
+                <Link
+                  to={ROUTES.LOGIN}
+                  className={`header-nav-link ${isActive(ROUTES.LOGIN) ? 'active' : ''}`}
+                >
+                  Login
+                </Link>
+              )}
             </li>
           </ul>
         </nav>

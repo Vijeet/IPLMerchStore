@@ -5,13 +5,15 @@ import { PaginatedResponse, ApiError } from '@appTypes/common';
 import { checkout, getUserOrders, getOrderDetail, cancelOrder } from '@services/ordersApi';
 import { QUERY_KEYS, ROUTES } from '@utils/constants';
 import { useToast } from '@components/shared/Toast';
+import { useAuth } from '@hooks/useAuth';
 
-const DEMO_USER_ID = 'demo-user-1';
-
-export const useOrders = (userId: string = DEMO_USER_ID, pageNumber = 1, pageSize = 10) => {
+export const useOrders = (pageNumber = 1, pageSize = 10) => {
+  const { userId: authUserId, isLoggedIn } = useAuth();
+  const userId = authUserId || 'guest';
   const ordersQuery = useQuery<PaginatedResponse<Order>, ApiError>({
     queryKey: [...QUERY_KEYS.ORDERS(userId), pageNumber, pageSize],
     queryFn: () => getUserOrders(userId, pageNumber, pageSize),
+    enabled: isLoggedIn,
     retry: 1,
     staleTime: 60 * 1000,
   });
@@ -24,11 +26,13 @@ export const useOrders = (userId: string = DEMO_USER_ID, pageNumber = 1, pageSiz
   };
 };
 
-export const useOrderDetail = (orderId: number, userId: string = DEMO_USER_ID) => {
+export const useOrderDetail = (orderId: number) => {
+  const { userId: authUserId, isLoggedIn } = useAuth();
+  const userId = authUserId || 'guest';
   const orderQuery = useQuery<Order, ApiError>({
     queryKey: QUERY_KEYS.ORDER(userId, String(orderId)),
     queryFn: () => getOrderDetail(orderId, userId),
-    enabled: orderId > 0,
+    enabled: isLoggedIn && orderId > 0,
     retry: 1,
     staleTime: 60 * 1000,
   });
@@ -41,7 +45,9 @@ export const useOrderDetail = (orderId: number, userId: string = DEMO_USER_ID) =
   };
 };
 
-export const useCheckout = (userId: string = DEMO_USER_ID) => {
+export const useCheckout = () => {
+  const { userId: authUserId } = useAuth();
+  const userId = authUserId || 'guest';
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -66,7 +72,9 @@ export const useCheckout = (userId: string = DEMO_USER_ID) => {
   };
 };
 
-export const useCancelOrder = (userId: string = DEMO_USER_ID) => {
+export const useCancelOrder = () => {
+  const { userId: authUserId } = useAuth();
+  const userId = authUserId || 'guest';
   const queryClient = useQueryClient();
   const { showToast } = useToast();
 

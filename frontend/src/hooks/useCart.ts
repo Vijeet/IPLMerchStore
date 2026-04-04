@@ -3,16 +3,18 @@ import { Cart, AddToCartRequest, UpdateCartItemRequest } from '@appTypes/cart';
 import { ApiError } from '@appTypes/common';
 import { getCart, addToCart, updateCartItem, removeCartItem } from '@services/cartApi';
 import { QUERY_KEYS } from '@utils/constants';
+import { useAuth } from '@hooks/useAuth';
 
-const DEMO_USER_ID = 'demo-user-1';
-
-export const useCart = (userId: string = DEMO_USER_ID) => {
+export const useCart = () => {
+  const { userId: authUserId, isLoggedIn } = useAuth();
+  const userId = authUserId || 'guest';
   const queryClient = useQueryClient();
   const cartQueryKey = QUERY_KEYS.CART(userId);
 
   const cartQuery = useQuery<Cart, ApiError>({
     queryKey: cartQueryKey,
     queryFn: () => getCart(userId),
+    enabled: isLoggedIn,
     retry: 1,
     staleTime: 2 * 60 * 1000,
   });

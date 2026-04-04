@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Cart } from '@appTypes/cart';
+import { CheckoutRequest } from '@appTypes/order';
 import { formatCurrency } from '@utils/formatters';
 import { Button } from '@components/shared';
 import { useCheckout } from '@hooks/useOrders';
 import { ROUTES } from '@utils/constants';
+import { CheckoutForm } from './CheckoutForm';
 
 interface CartSummaryProps {
   cart: Cart;
@@ -14,10 +16,11 @@ interface CartSummaryProps {
 export const CartSummary: React.FC<CartSummaryProps> = ({ cart, isMutating }) => {
   const navigate = useNavigate();
   const { checkout, isCheckingOut } = useCheckout();
+  const [showForm, setShowForm] = useState(false);
 
-  const handleCheckout = async () => {
+  const handleCheckout = async (details: CheckoutRequest) => {
     try {
-      await checkout({});
+      await checkout(details);
     } catch {
       // Error toast handled in useCheckout hook
     }
@@ -55,31 +58,40 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ cart, isMutating }) =>
         </div>
       </div>
 
-      <Button
-        variant="primary"
-        disabled={isMutating || isCheckingOut || cart.isEmpty}
-        loading={isCheckingOut}
-        onClick={handleCheckout}
-        className=""
-      >
-        {isCheckingOut ? 'Placing Order...' : 'Place Order'}
-      </Button>
+      {showForm ? (
+        <CheckoutForm
+          onSubmit={handleCheckout}
+          onCancel={() => setShowForm(false)}
+          isSubmitting={isCheckingOut}
+        />
+      ) : (
+        <>
+          <Button
+            variant="primary"
+            disabled={isMutating || cart.isEmpty}
+            onClick={() => setShowForm(true)}
+            className=""
+          >
+            Place Order
+          </Button>
 
-      <button
-        onClick={() => navigate(ROUTES.PRODUCTS)}
-        style={{
-          width: '100%',
-          marginTop: '0.75rem',
-          background: 'none',
-          border: 'none',
-          color: 'var(--secondary-color)',
-          cursor: 'pointer',
-          fontSize: '0.9rem',
-          padding: '0.5rem',
-        }}
-      >
-        Continue Shopping
-      </button>
+          <button
+            onClick={() => navigate(ROUTES.PRODUCTS)}
+            style={{
+              width: '100%',
+              marginTop: '0.75rem',
+              background: 'none',
+              border: 'none',
+              color: 'var(--secondary-color)',
+              cursor: 'pointer',
+              fontSize: '0.9rem',
+              padding: '0.5rem',
+            }}
+          >
+            Continue Shopping
+          </button>
+        </>
+      )}
     </div>
   );
 };

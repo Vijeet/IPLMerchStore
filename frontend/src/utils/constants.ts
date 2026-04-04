@@ -1,5 +1,6 @@
 export const ROUTES = {
   HOME: '/',
+  LOGIN: '/login',
   PRODUCTS: '/products',
   PRODUCT_DETAILS: '/products/:id',
   CART: '/cart',
@@ -14,17 +15,17 @@ export const API_ENDPOINTS = {
   SEARCH: '/search',
 
   // Cart
-  CART: (userId: string) => `/cart/${userId}`,
-  ADD_TO_CART: (userId: string) => `/cart/${userId}/items`,
-  UPDATE_CART_ITEM: (userId: string, productId: string) => `/cart/${userId}/items/${productId}`,
-  REMOVE_CART_ITEM: (userId: string, productId: string) => `/cart/${userId}/items/${productId}`,
-  CLEAR_CART: (userId: string) => `/cart/${userId}`,
+  CART: (userId: string) => `/cart/${encodeURIComponent(userId)}`,
+  ADD_TO_CART: (userId: string) => `/cart/${encodeURIComponent(userId)}/items`,
+  UPDATE_CART_ITEM: (userId: string, productId: string) => `/cart/${encodeURIComponent(userId)}/items/${productId}`,
+  REMOVE_CART_ITEM: (userId: string, productId: string) => `/cart/${encodeURIComponent(userId)}/items/${productId}`,
+  CLEAR_CART: (userId: string) => `/cart/${encodeURIComponent(userId)}`,
 
   // Orders
-  ORDERS: (userId: string) => `/orders/${userId}`,
-  ORDER_DETAILS: (userId: string, orderId: string) => `/orders/${userId}/${orderId}`,
-  CHECKOUT: (userId: string) => `/orders/checkout?userId=${userId}`,
-  CANCEL_ORDER: (userId: string, orderId: string) => `/orders/${userId}/${orderId}/cancel`,
+  ORDERS: (userId: string) => `/orders/${encodeURIComponent(userId)}`,
+  ORDER_DETAILS: (userId: string, orderId: string) => `/orders/${encodeURIComponent(userId)}/${orderId}`,
+  CHECKOUT: (userId: string) => `/orders/checkout?userId=${encodeURIComponent(userId)}`,
+  CANCEL_ORDER: (userId: string, orderId: string) => `/orders/${encodeURIComponent(userId)}/${orderId}/cancel`,
 
   // Franchises
   FRANCHISES: '/franchises',
