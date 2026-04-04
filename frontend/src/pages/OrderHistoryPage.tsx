@@ -2,12 +2,13 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LoadingSpinner, EmptyState, ErrorBoundary } from '@components/shared';
 import { OrderList } from '@components/orders';
-import { useOrders } from '@hooks/useOrders';
+import { useOrders, useCancelOrder } from '@hooks/useOrders';
 import { ROUTES } from '@utils/constants';
 
 export const OrderHistoryPage: React.FC = () => {
   const navigate = useNavigate();
   const { orders, isLoading, isError, error } = useOrders();
+  const { cancelOrder, isCancelling } = useCancelOrder();
 
   if (isLoading) {
     return <LoadingSpinner message="Loading your orders..." />;
@@ -40,7 +41,7 @@ export const OrderHistoryPage: React.FC = () => {
           icon="📋"
         />
       ) : (
-        <OrderList orders={orderItems} />
+        <OrderList orders={orderItems} onCancel={cancelOrder} isCancelling={isCancelling} />
       )}
     </div>
   );

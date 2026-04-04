@@ -24,6 +24,7 @@ export const API_ENDPOINTS = {
   ORDERS: (userId: string) => `/orders/${userId}`,
   ORDER_DETAILS: (userId: string, orderId: string) => `/orders/${userId}/${orderId}`,
   CHECKOUT: (userId: string) => `/orders/checkout?userId=${userId}`,
+  CANCEL_ORDER: (userId: string, orderId: string) => `/orders/${userId}/${orderId}/cancel`,
 
   // Franchises
   FRANCHISES: '/franchises',

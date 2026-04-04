@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { Order, CheckoutRequest } from '@appTypes/order';
 import { PaginatedResponse, ApiError } from '@appTypes/common';
-import { checkout, getUserOrders, getOrderDetail } from '@services/ordersApi';
+import { checkout, getUserOrders, getOrderDetail, cancelOrder } from '@services/ordersApi';
 import { QUERY_KEYS, ROUTES } from '@utils/constants';
 import { useToast } from '@components/shared/Toast';
 
@@ -63,5 +63,26 @@ export const useCheckout = (userId: string = DEMO_USER_ID) => {
     checkout: checkoutMutation.mutateAsync,
     isCheckingOut: checkoutMutation.isPending,
     checkoutError: checkoutMutation.error,
+  };
+};
+
+export const useCancelOrder = (userId: string = DEMO_USER_ID) => {
+  const queryClient = useQueryClient();
+  const { showToast } = useToast();
+
+  const cancelMutation = useMutation<Order, ApiError, number>({
+    mutationFn: (orderId) => cancelOrder(orderId, userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS(userId) });
+      showToast('Order cancelled successfully', 'success');
+    },
+    onError: (error) => {
+      showToast(error.message || 'Failed to cancel order', 'error');
+    },
+  });
+
+  return {
+    cancelOrder: cancelMutation.mutateAsync,
+    isCancelling: cancelMutation.isPending,
   };
 };

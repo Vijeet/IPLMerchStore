@@ -81,11 +81,11 @@ public class OrdersController : ControllerBase
         if (!result.Success)
         {
             _logger.LogWarning("Checkout failed for user {UserId}: {Message}", userId, result.Message);
-            return BadRequest(result.Message);
+            return BadRequest(result);
         }
 
         _logger.LogInformation("Checkout successful for user {UserId}, OrderId: {OrderId}", userId, result.Data?.Id);
-        return Ok(result.Data);
+        return Ok(result);
     }
 
     /// <summary>
@@ -127,17 +127,11 @@ public class OrdersController : ControllerBase
         if (!result.Success)
         {
             _logger.LogWarning("Failed to retrieve orders for user {UserId}: {Message}", userId, result.Message);
-            return BadRequest(result.Message);
+            return BadRequest(result);
         }
 
-        if (result.Data == null || !result.Data.Items.Any())
-        {
-            _logger.LogInformation("No orders found for user {UserId}", userId);
-            return Ok(result.Data);
-        }
-
-        _logger.LogInformation("Retrieved {OrderCount} orders for user {UserId}", result.Data.Items.Count(), userId);
-        return Ok(result.Data);
+        _logger.LogInformation("Retrieved orders for user {UserId}", userId);
+        return Ok(result);
     }
 
     /// <summary>
@@ -184,13 +178,13 @@ public class OrdersController : ControllerBase
         if (!result.Success)
         {
             _logger.LogWarning("Failed to retrieve order {OrderId}: {Message}", orderId, result.Message);
-            return BadRequest(result.Message);
+            return BadRequest(result);
         }
 
         if (result.Data == null)
         {
             _logger.LogInformation("Order {OrderId} not found", orderId);
-            return NotFound(new { message = "Order not found" });
+            return NotFound(new { success = false, message = "Order not found" });
         }
 
         // Verify order belongs to the requesting user
@@ -198,10 +192,45 @@ public class OrdersController : ControllerBase
         {
             _logger.LogWarning("User {UserId} attempted to access order {OrderId} belonging to {ActualUserId}",
                 userId, orderId, result.Data.UserId);
-            return NotFound(new { message = "Order not found" });
+            return NotFound(new { success = false, message = "Order not found" });
         }
 
         _logger.LogInformation("Retrieved order {OrderId} for user {UserId}", orderId, userId);
-        return Ok(result.Data);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Cancel a pending order
+    /// </summary>
+    [HttpPost("{userId}/{orderId}/cancel")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(OrderDto))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> CancelOrder(
+        string userId,
+        int orderId,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return BadRequest("User ID is required");
+        }
+
+        if (orderId <= 0)
+        {
+            return BadRequest("Order ID must be greater than 0");
+        }
+
+        _logger.LogInformation("Cancel requested for order {OrderId} by user {UserId}", orderId, userId);
+
+        var result = await _orderService.CancelOrderAsync(userId, orderId, cancellationToken);
+
+        if (!result.Success)
+        {
+            _logger.LogWarning("Cancel failed for order {OrderId}: {Message}", orderId, result.Message);
+            return BadRequest(result);
+        }
+
+        return Ok(result);
     }
 }
