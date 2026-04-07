@@ -14,7 +14,6 @@ export const useCart = () => {
   const cartQuery = useQuery<Cart, ApiError>({
     queryKey: cartQueryKey,
     queryFn: () => getCart(userId),
-    enabled: isLoggedIn,
     retry: 1,
     staleTime: 2 * 60 * 1000,
   });
