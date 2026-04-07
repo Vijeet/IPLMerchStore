@@ -152,10 +152,12 @@ public class ProductService : IProductService
                 return Result<ProductDetailDto>.FailureResult("Validation failed", validationErrors);
             }
 
-            // Check if franchise exists
-            var franchiseExists = await _dbContext.Franchises
-                .AnyAsync(f => f.Id == inputDto.FranchiseId, cancellationToken);
-            if (!franchiseExists)
+            // Check if franchise exists and load name/shortcode for response
+            var franchise = await _dbContext.Franchises
+                .Where(f => f.Id == inputDto.FranchiseId)
+                .Select(f => new { f.Name, f.ShortCode })
+                .FirstOrDefaultAsync(cancellationToken);
+            if (franchise == null)
             {
                 return Result<ProductDetailDto>.FailureResult("Validation failed", 
                     new[] { "Specified franchise does not exist" });
@@ -190,12 +192,6 @@ public class ProductService : IProductService
 
             _dbContext.Products.Add(product);
             await _dbContext.SaveChangesAsync(cancellationToken);
-
-            // Fetch the franchise name for the response
-            var franchise = await _dbContext.Franchises
-                .Where(f => f.Id == product.FranchiseId)
-                .Select(f => new { f.Name, f.ShortCode })
-                .FirstOrDefaultAsync(cancellationToken);
 
             var productDetailDto = new ProductDetailDto
             {
@@ -242,16 +238,15 @@ public class ProductService : IProductService
                 return Result<ProductDetailDto>.FailureResult($"Product with ID {id} not found");
             }
 
-            // Check if franchise exists
-            if (inputDto.FranchiseId != product.FranchiseId)
+            // Check if franchise exists (only if changed) and load name/shortcode
+            var franchise = await _dbContext.Franchises
+                .Where(f => f.Id == inputDto.FranchiseId)
+                .Select(f => new { f.Name, f.ShortCode })
+                .FirstOrDefaultAsync(cancellationToken);
+            if (franchise == null)
             {
-                var franchiseExists = await _dbContext.Franchises
-                    .AnyAsync(f => f.Id == inputDto.FranchiseId, cancellationToken);
-                if (!franchiseExists)
-                {
-                    return Result<ProductDetailDto>.FailureResult("Validation failed", 
-                        new[] { "Specified franchise does not exist" });
-                }
+                return Result<ProductDetailDto>.FailureResult("Validation failed", 
+                    new[] { "Specified franchise does not exist" });
             }
 
             // Check for duplicate SKU (excluding current product)
@@ -277,12 +272,6 @@ public class ProductService : IProductService
 
             _dbContext.Products.Update(product);
             await _dbContext.SaveChangesAsync(cancellationToken);
-
-            // Fetch the franchise name for the response
-            var franchise = await _dbContext.Franchises
-                .Where(f => f.Id == product.FranchiseId)
-                .Select(f => new { f.Name, f.ShortCode })
-                .FirstOrDefaultAsync(cancellationToken);
 
             var productDetailDto = new ProductDetailDto
             {

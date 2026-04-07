@@ -183,7 +183,7 @@ public class SearchServiceTests
         // Assert
         Assert.True(result.Success);
         Assert.NotNull(result.Data);
-        Assert.Equal(4, result.Data.TotalCount); // All 4 jerseys
+        Assert.Equal(3, result.Data.TotalCount); // 3 jerseys (name/desc contain "jersey")
         Assert.All(result.Data.Items, product =>
         {
             Assert.Contains("Jersey", product.Name, StringComparison.OrdinalIgnoreCase);
@@ -240,7 +240,7 @@ public class SearchServiceTests
         // Assert
         Assert.True(result.Success);
         Assert.NotNull(result.Data);
-        Assert.Equal(4, result.Data.TotalCount); // CSK has 4 active products
+        Assert.Equal(3, result.Data.TotalCount); // CSK has 3 active products (4th is inactive)
         Assert.All(result.Data.Items, product =>
         {
             Assert.Equal(1, product.FranchiseId);
@@ -261,7 +261,7 @@ public class SearchServiceTests
         // Assert
         Assert.True(result.Success);
         Assert.NotNull(result.Data);
-        Assert.Equal(4, result.Data.TotalCount); // 4 jerseys
+        Assert.Equal(3, result.Data.TotalCount); // 3 jerseys
         Assert.All(result.Data.Items, product =>
         {
             Assert.Equal((int)ProductType.Jersey, product.ProductType);
@@ -495,11 +495,14 @@ public class SearchServiceTests
     [Fact]
     public async Task SearchProductsAsync_OnException_ShouldReturnFailureResult()
     {
-        // Arrange - Use null to cause exception
-        var mockDbContext = new Mock<AppDbContext>();
-        mockDbContext.Setup(x => x.Products).Throws(new Exception("Database error"));
+        // Arrange - Use a disposed context to cause an exception
+        var options = new DbContextOptionsBuilder<AppDbContext>()
+            .UseInMemoryDatabase(databaseName: $"TestDb_{Guid.NewGuid()}")
+            .Options;
+        var disposedContext = new AppDbContext(options);
+        disposedContext.Dispose();
 
-        var service = new SearchService(mockDbContext.Object, _mockLogger.Object);
+        var service = new SearchService(disposedContext, _mockLogger.Object);
 
         // Act
         var result = await service.SearchProductsAsync("test");

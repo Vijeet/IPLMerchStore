@@ -61,6 +61,7 @@ public class OrderService : IOrderService
                 .Where(o => o.Id == id)
                 .Include(o => o.Items)
                 .ThenInclude(oi => oi.Product)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (order == null)
@@ -107,6 +108,7 @@ public class OrderService : IOrderService
                 .Where(o => o.UserId == userId)
                 .Include(o => o.Items)
                 .ThenInclude(oi => oi.Product)
+                .AsNoTracking()
                 .OrderByDescending(o => o.CreatedAtUtc);
 
             // Get total count
@@ -238,13 +240,12 @@ public class OrderService : IOrderService
 
                 // Reduce product inventory
                 product.InventoryCount -= cartItem.Quantity;
-                _dbContext.Products.Update(product);
             }
 
             // Set order total
             order.TotalAmount = orderTotal;
 
-            // Add order to database
+            // Add order to database and save all changes in one batch
             _dbContext.Orders.Add(order);
             await _dbContext.SaveChangesAsync(cancellationToken);
 
@@ -280,14 +281,8 @@ public class OrderService : IOrderService
             // Commit transaction
             await transaction.CommitAsync(cancellationToken);
 
-            // Map to DTO and return
-            var createdOrder = await _dbContext.Orders
-                .Where(o => o.Id == order.Id)
-                .Include(o => o.Items)
-                .ThenInclude(oi => oi.Product)
-                .FirstOrDefaultAsync(cancellationToken);
-
-            var orderResponseDto = MapOrderToDto(createdOrder!);
+            // Map to DTO using the in-memory order (no need to reload from DB)
+            var orderResponseDto = MapOrderToDto(order);
 
             _logger.LogInformation(
                 "Order created successfully for user {UserId}. OrderId: {OrderId}, Total: {Total}",
@@ -336,13 +331,11 @@ public class OrderService : IOrderService
                 if (item.Product != null)
                 {
                     item.Product.InventoryCount += item.Quantity;
-                    _dbContext.Products.Update(item.Product);
                 }
             }
 
             order.Status = OrderStatus.Cancelled;
             order.UpdatedAtUtc = DateTime.UtcNow;
-            _dbContext.Orders.Update(order);
 
             await _dbContext.SaveChangesAsync(cancellationToken);
 
