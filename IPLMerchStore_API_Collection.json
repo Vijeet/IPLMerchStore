@@ -1,0 +1,422 @@
+{
+	"info": {
+		"_postman_id": "ipl-merch-store-api",
+		"name": "IPL Merch Store API",
+		"description": "Complete API collection for the IPL Merch Store backend. Base URL: https://localhost:5001",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://localhost:5001",
+			"type": "string"
+		},
+		{
+			"key": "userId",
+			"value": "user123",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Health",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/health",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "health"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Franchises",
+			"item": [
+				{
+					"name": "Get All Franchises",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/franchises?pageNumber=1&pageSize=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "franchises"],
+							"query": [
+								{ "key": "pageNumber", "value": "1" },
+								{ "key": "pageSize", "value": "10" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Franchise by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/franchises/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "franchises", "1"]
+						}
+					}
+				},
+				{
+					"name": "Create Franchise",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Mumbai Indians\",\n  \"shortCode\": \"MI\",\n  \"primaryColor\": \"#004687\",\n  \"secondaryColor\": \"#F4C300\",\n  \"logoUrl\": \"https://example.com/mi-logo.png\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/franchises",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "franchises"]
+						}
+					}
+				},
+				{
+					"name": "Update Franchise",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Mumbai Indians\",\n  \"shortCode\": \"MI\",\n  \"primaryColor\": \"#004687\",\n  \"secondaryColor\": \"#F4C300\",\n  \"logoUrl\": \"https://example.com/mi-logo-updated.png\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/franchises/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "franchises", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Products",
+			"item": [
+				{
+					"name": "Get All Products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/products?pageNumber=1&pageSize=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "products"],
+							"query": [
+								{ "key": "pageNumber", "value": "1" },
+								{ "key": "pageSize", "value": "10" },
+								{ "key": "franchiseId", "value": "", "disabled": true },
+								{ "key": "productType", "value": "", "disabled": true },
+								{ "key": "activeOnly", "value": "true", "disabled": true },
+								{ "key": "sortBy", "value": "name", "disabled": true }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get All Products (Filter by Franchise)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/products?pageNumber=1&pageSize=10&franchiseId=1&activeOnly=true",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "products"],
+							"query": [
+								{ "key": "pageNumber", "value": "1" },
+								{ "key": "pageSize", "value": "10" },
+								{ "key": "franchiseId", "value": "1" },
+								{ "key": "activeOnly", "value": "true" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get All Products (Sort by Price Desc)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/products?pageNumber=1&pageSize=10&sortBy=price_desc",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "products"],
+							"query": [
+								{ "key": "pageNumber", "value": "1" },
+								{ "key": "pageSize", "value": "10" },
+								{ "key": "sortBy", "value": "price_desc" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Product by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/products/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "products", "1"]
+						}
+					}
+				},
+				{
+					"name": "Search Products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/products/search?name=jersey&pageNumber=1&pageSize=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "products", "search"],
+							"query": [
+								{ "key": "name", "value": "jersey" },
+								{ "key": "franchiseId", "value": "", "disabled": true },
+								{ "key": "productType", "value": "", "disabled": true },
+								{ "key": "pageNumber", "value": "1" },
+								{ "key": "pageSize", "value": "10" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Product",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"IPL Jersey - Mumbai Indians\",\n  \"description\": \"Official Mumbai Indians franchise jersey for IPL 2026\",\n  \"price\": 1299.00,\n  \"currency\": \"INR\",\n  \"inventoryCount\": 100,\n  \"productType\": 1,\n  \"franchiseId\": 1,\n  \"imageUrl\": \"https://example.com/mi-jersey.jpg\",\n  \"isActive\": true,\n  \"sku\": \"MI-JERSEY-001\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/products",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "products"]
+						}
+					}
+				},
+				{
+					"name": "Update Product",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"IPL Jersey - Mumbai Indians (Updated)\",\n  \"description\": \"Official Mumbai Indians franchise jersey for IPL 2026 - Limited Edition\",\n  \"price\": 1499.00,\n  \"currency\": \"INR\",\n  \"inventoryCount\": 50,\n  \"productType\": 1,\n  \"franchiseId\": 1,\n  \"imageUrl\": \"https://example.com/mi-jersey-v2.jpg\",\n  \"isActive\": true,\n  \"sku\": \"MI-JERSEY-001\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/products/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "products", "1"]
+						}
+					}
+				},
+				{
+					"name": "Delete Product (Soft Delete)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/products/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "products", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Cart",
+			"item": [
+				{
+					"name": "Get User Cart",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/cart/{{userId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "cart", "{{userId}}"]
+						}
+					}
+				},
+				{
+					"name": "Add Item to Cart",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"productId\": 1,\n  \"quantity\": 2\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/cart/{{userId}}/items",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "cart", "{{userId}}", "items"]
+						}
+					}
+				},
+				{
+					"name": "Update Cart Item Quantity",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"quantity\": 5\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/cart/{{userId}}/items/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "cart", "{{userId}}", "items", "1"]
+						}
+					}
+				},
+				{
+					"name": "Remove Item from Cart",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/cart/{{userId}}/items/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "cart", "{{userId}}", "items", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Orders",
+			"item": [
+				{
+					"name": "Checkout (Create Order)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"shippingAddress\": \"123 Main Street, Andheri West, Mumbai 400058, India\",\n  \"customerEmail\": \"testuser@example.com\",\n  \"customerPhone\": \"+91-9876543210\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/orders/checkout?userId={{userId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders", "checkout"],
+							"query": [
+								{ "key": "userId", "value": "{{userId}}" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get User Orders",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/orders/{{userId}}?pageNumber=1&pageSize=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders", "{{userId}}"],
+							"query": [
+								{ "key": "pageNumber", "value": "1" },
+								{ "key": "pageSize", "value": "10" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Order Details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/orders/{{userId}}/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders", "{{userId}}", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Search",
+			"item": [
+				{
+					"name": "Search Products by Name",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/products/search?name=jersey&pageNumber=1&pageSize=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "products", "search"],
+							"query": [
+								{ "key": "name", "value": "jersey" },
+								{ "key": "pageNumber", "value": "1" },
+								{ "key": "pageSize", "value": "10" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Search Products by Franchise",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/products/search?franchiseId=1&pageNumber=1&pageSize=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "products", "search"],
+							"query": [
+								{ "key": "franchiseId", "value": "1" },
+								{ "key": "pageNumber", "value": "1" },
+								{ "key": "pageSize", "value": "10" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Search Products by Type",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/products/search?productType=1&pageNumber=1&pageSize=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "products", "search"],
+							"query": [
+								{ "key": "productType", "value": "1" },
+								{ "key": "pageNumber", "value": "1" },
+								{ "key": "pageSize", "value": "10" }
+							]
+						}
+					}
+				}
+			]
+		}
+	]
+}

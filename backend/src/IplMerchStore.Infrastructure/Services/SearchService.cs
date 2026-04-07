@@ -96,21 +96,33 @@ public class SearchService : ISearchService
             // Get total count before pagination
             var totalCount = await searchQuery.CountAsync(cancellationToken);
 
-            // Calculate relevance score and apply sorting
-            // Name matches score higher (90-100) than description matches (50-89)
-            // Then sort alphabetically by name for consistent results
-            var results = searchQuery
-                .AsEnumerable() // Switch to LINQ-to-Objects for relevance calculation
-                .Select(p => new
-                {
-                    Product = p,
-                    RelevanceScore = CalculateRelevanceScore(p, query)
-                })
-                .OrderByDescending(x => x.RelevanceScore)
-                .ThenBy(x => x.Product.Name)
+            // Apply relevance-based ordering at the database level using CASE expressions
+            // This avoids loading all matching rows into memory
+            IQueryable<Domain.Entities.Product> orderedQuery;
+            if (!string.IsNullOrWhiteSpace(query))
+            {
+                var normalizedQ = query.Trim().ToLower();
+                orderedQuery = searchQuery
+                    .OrderByDescending(p =>
+                        p.Name.ToLower().StartsWith(normalizedQ) ? 3 :
+                        p.Name.ToLower().Contains(normalizedQ) ? 2 :
+                        p.Description.ToLower().Contains(normalizedQ) ? 1 : 0)
+                    .ThenBy(p => p.Name);
+            }
+            else
+            {
+                orderedQuery = searchQuery.OrderBy(p => p.Name);
+            }
+
+            // Paginate at DB level, then calculate relevance scores on just the page
+            var products = await orderedQuery
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
-                .Select(x => MapToProductSearchResultDto(x.Product, x.RelevanceScore))
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+
+            var results = products
+                .Select(p => MapToProductSearchResultDto(p, CalculateRelevanceScore(p, query)))
                 .ToList();
 
             var pagedResult = new PagedResult<ProductSearchResultDto>(
@@ -165,20 +177,31 @@ public class SearchService : ISearchService
                     p.Description.ToLower().Contains(normalizedQuery));
             }
 
-            // Get unique product names and franchise combinations
-            // Sorted by relevance (name matches first) then alphabetically
-            var suggestions = suggestionsQuery
-                .AsEnumerable()
-                .Select(p => new
-                {
-                    Product = p,
-                    RelevanceScore = CalculateRelevanceScore(p, query)
-                })
-                .OrderByDescending(x => x.RelevanceScore)
-                .ThenBy(x => x.Product.Name)
-                .Select(x => x.Product)
+            // Sort by relevance at the database level and limit results
+            IQueryable<Domain.Entities.Product> orderedSuggestions;
+            if (!string.IsNullOrWhiteSpace(query))
+            {
+                var normalizedQ = query.Trim().ToLower();
+                orderedSuggestions = suggestionsQuery
+                    .OrderByDescending(p =>
+                        p.Name.ToLower().StartsWith(normalizedQ) ? 3 :
+                        p.Name.ToLower().Contains(normalizedQ) ? 2 :
+                        p.Description.ToLower().Contains(normalizedQ) ? 1 : 0)
+                    .ThenBy(p => p.Name);
+            }
+            else
+            {
+                orderedSuggestions = suggestionsQuery.OrderBy(p => p.Name);
+            }
+
+            var suggestionData = await orderedSuggestions
                 .Take(limit)
-                .Select(p => $"{p.Name} ({p.Franchise?.ShortCode ?? "Unknown"})")
+                .AsNoTracking()
+                .Select(p => new { p.Name, ShortCode = p.Franchise != null ? p.Franchise.ShortCode : "Unknown" })
+                .ToListAsync(cancellationToken);
+
+            var suggestions = suggestionData
+                .Select(p => $"{p.Name} ({p.ShortCode})")
                 .ToList();
 
             return Result<IEnumerable<string>>.SuccessResult(

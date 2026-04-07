@@ -398,12 +398,21 @@ public class OrderServiceTests
         var userId = "test-user";
         var checkoutRequest = new CreateOrderDto();
 
+        _mockPaymentService
+            .Setup(x => x.ProcessPaymentAsync(
+                It.IsAny<int>(),
+                It.IsAny<decimal>(),
+                It.IsAny<string>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Result<bool>.SuccessResult(true, "Payment successful"));
+
         _mockCartService
             .Setup(x => x.ClearCartAsync(userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new Result { Success = true, Message = "Cleared" });
 
         // Create an order
         var createResult = await _orderService.CreateOrderAsync(userId, checkoutRequest);
+        Assert.True(createResult.Success, $"Order creation failed: {createResult.Message}");
         var orderId = createResult.Data.Id;
 
         // Act

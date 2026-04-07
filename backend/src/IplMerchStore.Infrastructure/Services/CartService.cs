@@ -51,6 +51,7 @@ public class CartService : ICartService
                 .Where(c => c.UserId == userId)
                 .Include(c => c.Items)
                 .ThenInclude(ci => ci.Product)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(cancellationToken);
 
             // Return null if cart doesn't exist (not an error state)
@@ -155,23 +156,17 @@ public class CartService : ICartService
                     CartId = cart.Id,
                     ProductId = product.Id,
                     Quantity = request.Quantity,
-                    UnitPrice = product.Price
+                    UnitPrice = product.Price,
+                    Product = product
                 };
 
-                _dbContext.CartItems.Add(newItem);
+                cart.Items.Add(newItem);
             }
 
             // Update cart total and save
             await _dbContext.SaveChangesAsync(cancellationToken);
 
-            // Reload cart with updated items for response
-            cart = await _dbContext.Carts
-                .Where(c => c.Id == cart.Id)
-                .Include(c => c.Items)
-                .ThenInclude(ci => ci.Product)
-                .FirstOrDefaultAsync(cancellationToken);
-
-            var cartResponse = MapCartToResponse(cart!);
+            var cartResponse = MapCartToResponse(cart);
             _logger.LogInformation("Added product {ProductId} to cart for user {UserId}", request.ProductId, userId);
 
             return Result<CartResponse>.SuccessResult(cartResponse, "Item added to cart successfully");
@@ -230,17 +225,11 @@ public class CartService : ICartService
             // Handle removal (quantity = 0)
             if (request.Quantity == 0)
             {
+                cart.Items.Remove(cartItem);
                 _dbContext.CartItems.Remove(cartItem);
                 await _dbContext.SaveChangesAsync(cancellationToken);
 
-                // Reload cart
-                cart = await _dbContext.Carts
-                    .Where(c => c.Id == cart.Id)
-                    .Include(c => c.Items)
-                    .ThenInclude(ci => ci.Product)
-                    .FirstOrDefaultAsync(cancellationToken);
-
-                var cartResponse = MapCartToResponse(cart!);
+                var cartResponse = MapCartToResponse(cart);
                 _logger.LogInformation("Removed product {ProductId} from cart for user {UserId}", productId, userId);
 
                 return Result<CartResponse>.SuccessResult(cartResponse, "Item removed from cart successfully");
@@ -264,14 +253,7 @@ public class CartService : ICartService
             _dbContext.CartItems.Update(cartItem);
             await _dbContext.SaveChangesAsync(cancellationToken);
 
-            // Reload cart
-            cart = await _dbContext.Carts
-                .Where(c => c.Id == cart.Id)
-                .Include(c => c.Items)
-                .ThenInclude(ci => ci.Product)
-                .FirstOrDefaultAsync(cancellationToken);
-
-            var updatedCartResponse = MapCartToResponse(cart!);
+            var updatedCartResponse = MapCartToResponse(cart);
             _logger.LogInformation("Updated cart item {ProductId} quantity to {Quantity} for user {UserId}", productId, request.Quantity, userId);
 
             return Result<CartResponse>.SuccessResult(updatedCartResponse, "Cart item updated successfully");
